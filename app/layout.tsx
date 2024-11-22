@@ -41,12 +41,12 @@ export default function RootLayout({
           />
         </head>
         <body className={nunito.className}>
-          <SignedOut>
+          {/* <SignedOut>
             <SignInButton />
           </SignedOut>
           <SignedIn>
             <UserButton />
-          </SignedIn>
+          </SignedIn> */}
           <NextTopLoader color="#27AE60" height={7} easing="ease" />
           <ContextProvider>
             <GlobalStyleProvider>
