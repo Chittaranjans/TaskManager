@@ -4,15 +4,8 @@ import "./globals.css";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import GlobalStyleProvider from "./providers/GlobalStyleProvider";
 import ContextProvider from "./providers/ContextProvider";
-import {
-  ClerkProvider,
-  SignedOut,
-  SignedIn,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import NextTopLoader from "nextjs-toploader";
-// import Navbar from "./Components/Navbar/Navbar";
 
 const nunito = Nunito({
   weight: ["400", "500", "600", "700", "800"],
@@ -42,12 +35,6 @@ export default function RootLayout({
           />
         </head>
         <body className={nunito.className}>
-          {/* <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn> */}
           <NextTopLoader color="#27AE60" height={7} easing="ease" />
           <ContextProvider>
             <GlobalStyleProvider>
