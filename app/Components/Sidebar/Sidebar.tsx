@@ -93,13 +93,13 @@ function Sidebar() {
           </div>
           <div className="flex gap-2">
             <Link
-              href="https://github.com/trojenM"
+              href="https://github.com/Chittaranjans"
               className="text-sm font-medium text-gray-200 hover:text-gray-200 ease-in-out transition-all duration-300"
             >
               Github &#8599;
             </Link>
             <Link
-              href="https://www.linkedin.com/in/omurbilgin/"
+              href="https://www.linkedin.com/in/chittaranjan18/"
               className="text-sm font-medium text-gray-200 hover:text-gray-200 ease-in-out transition-all duration-300"
             >
               LinkedIn &#8599;
