@@ -71,11 +71,23 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
     try {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+        const data = await req.json();
 
-    }
-    catch (error) {
-        console.log("Error updating tasks: ", error);
-        return NextResponse.json({ error: "Error updating tasks" }, { status: 500 })
+        if (!id) {
+            return NextResponse.json({ error: "Missing task ID" }, { status: 400 });
+        }
+
+        const updatedTask = await prisma.task.update({
+            where: { id: id as string },
+            data,
+        });
+
+        return NextResponse.json(updatedTask);
+    } catch (error) {
+        console.error("Error updating tasks: ", error);
+        return NextResponse.json({ error: "Error updating tasks" }, { status: 500 });
     }
 }
 

@@ -1,7 +1,7 @@
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import themes from "./themes";
-import axios, { all } from "axios";
+import axios from "axios";
 import toast from "react-hot-toast";
 import { useUser } from "@clerk/nextjs";
 
@@ -17,10 +17,14 @@ export const GlobalProvider = ({ children }) => {
     const [tasks, setTasks] = useState([]);
     const [modal, setModal] = useState(false);
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
+    const [editTask, setEditTask] = useState(null);
 
     const openModal = () => setModal(true);
 
-    const closeModal = () => setModal(false);
+    const closeModal = () => {
+        setModal(false);
+        setEditTask(null); // Reset editTask when closing the modal
+    };
 
     const toggleSidebar = () => setSidebarCollapsed(!isSidebarCollapsed);
 
@@ -36,7 +40,6 @@ export const GlobalProvider = ({ children }) => {
                 return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
             });
 
-
             setTasks(sortedTasks);
             setIsLoading(false);
         } catch (error) {
@@ -47,7 +50,7 @@ export const GlobalProvider = ({ children }) => {
 
     const deleteTask = async (id) => {
         try {
-            const res = await axios.delete(`/api/tasks/${id}`);
+            await axios.delete(`/api/tasks/${id}`);
             toast.success("Task Deleted.");
             allTasks();
         } catch (error) {
@@ -58,14 +61,19 @@ export const GlobalProvider = ({ children }) => {
 
     const updateTask = async (id, task) => {
         try {
-            const res = await axios.put(`/api/tasks/${id}`, task);
+            await axios.put(`/api/tasks/${id}`, task);
             toast.success("Task Updated.");
             allTasks();
         } catch (error) {
             console.log(error);
             toast.error("Something went wrong");
         }
-    }
+    };
+
+    const edit = (task) => {
+        setEditTask(task);
+        openModal();
+    };
 
     const completedTasks = tasks.filter((task) => task.isCompleted === true);
 
@@ -73,7 +81,7 @@ export const GlobalProvider = ({ children }) => {
 
     const importantTasks = tasks.filter((task) => task.isImportant === true);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (user) allTasks();
     }, [user]);
 
@@ -88,6 +96,8 @@ export const GlobalProvider = ({ children }) => {
             allTasks,
             deleteTask,
             updateTask,
+            edit,
+            editTask,
             completedTasks,
             incompletedTasks,
             importantTasks,
@@ -100,7 +110,7 @@ export const GlobalProvider = ({ children }) => {
             </GlobalUpdateContext.Provider>
         </GlobalContext.Provider>
     );
-}
+};
 
 export const useGlobalState = () => useContext(GlobalContext);
 export const useGlobalUpdate = () => useContext(GlobalUpdateContext);

@@ -1,8 +1,8 @@
 "use client";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { add, plus } from "@/app/utils/icons";
+import { add } from "@/app/utils/icons";
 import Button from "../Button/Button";
 import styled from "styled-components";
 import { useGlobalState } from "@/app/context/GlobalProvider";
@@ -15,7 +15,17 @@ function CreateContent() {
   const [completed, setCompleted] = useState(false);
   const [important, setImportant] = useState(false);
 
-  const { theme, allTasks, closeModal } = useGlobalState();
+  const { theme, allTasks, closeModal, editTask } = useGlobalState();
+
+  useEffect(() => {
+    if (editTask) {
+      setTitle(editTask.title);
+      setDescription(editTask.description);
+      setDate(moment(editTask.date).format("YYYY-MM-DD"));
+      setCompleted(editTask.isCompleted);
+      setImportant(editTask.isImportant);
+    }
+  }, [editTask]);
 
   const handleChange = (name: string) => (e: any) => {
     switch (name) {
@@ -51,24 +61,24 @@ function CreateContent() {
     };
 
     try {
-      const res = await axios.post("/api/tasks", task);
-
-      if (res.data.error) {
-        toast.error(res.data.error);
+      if (editTask && editTask.id) {
+        await axios.put(`/api/tasks/${editTask.id}`, task);
+        toast.success("Task updated successfully");
       } else {
+        await axios.post("/api/tasks", task);
         toast.success("Task created successfully");
-        allTasks();
-        closeModal();
       }
+      allTasks();
+      closeModal();
     } catch (error) {
       toast.error("Something went wrong");
-      console.log("Error creating task: ", error);
+      console.log("Error creating/updating task: ", error);
     }
   };
 
   return (
     <CreateContentStyled theme={theme} onSubmit={handleSubmit}>
-      <h1>Create a Task</h1>
+      <h1>{editTask ? "Edit Task" : "Create a Task"}</h1>
       <div className="input-control">
         <label htmlFor="title">Title</label>
         <input
@@ -77,7 +87,7 @@ function CreateContent() {
           value={title}
           name="title"
           onChange={handleChange("title")}
-          placeholder="e.g, Watch a video from Youtube."
+          placeholder="e.g, Learn Next.js"
         />
       </div>
       <div className="input-control">
@@ -114,6 +124,7 @@ function CreateContent() {
       <div className="input-control toggler">
         <label htmlFor="important">Toggle Important</label>
         <input
+          onClick={() => setImportant(!important)}
           value={important.toString()}
           onChange={handleChange("important")}
           type="checkbox"
@@ -125,7 +136,7 @@ function CreateContent() {
       <div className="submit-btn flex justify-end">
         <Button
           type="submit"
-          name="Create Task"
+          name={editTask ? "Update Task" : "Create Task"}
           icon={add}
           padding={"0.6rem 1.1rem"}
           borderRad={"0.8rem"}
@@ -139,54 +150,92 @@ function CreateContent() {
 }
 
 const CreateContentStyled = styled.form`
+  background-color: ${(props) => props.theme.colorBg};
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+
   > h1 {
-    font-size: clamp(1.5rem, 2vw, 2rem);
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: ${(props) => props.theme.colorPrimary};
   }
 
-  color: ${(props) => props.theme.colorGrey1};
-
   .input-control {
-    position: relative;
-    margin: 1.6rem 0;
-    font-weight: 500;
+    margin-bottom: 1.5rem;
 
     label {
-      font-size: clamp(0.9rem, 2vw, 1.2rem);
-      display: inline-block;
-
-      span {
-        color: ${(props) => props.theme.colorGrey3};
-      }
+      display: block;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #fff
+      color: ${(props) => props.theme.colorText};
     }
 
     input,
     textarea {
       width: 100%;
-      padding: 0.4rem;
-      resize: none;
-
-      background-color: ${(props) => props.theme.colorGrey0};
-      color: ${(props) => props.theme.colorText};
+      padding: 0.75rem;
+      border: 1px solid ${(props) => props.theme.colorBorder};
       border-radius: 0.5rem;
-    }
+      background-color: ${(props) => props.theme.colorBg3};
+      color: ${(props) => props.theme.colorText};
+      color: white;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      box-shadow: 0.3s ease;
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      font-size: 1.2rem;
-      cursor: pointer;
+      &:focus {
+        border-color: ${(props) => props.theme.colorPrimary};
+        box-shadow: 0 0 0 3px rgba(98 , 0 , 238 , 0.2);
+        }
+    }
+      
+    
+    
+
+    textarea {
+      resize: vertical;
     }
   }
 
   .toggler {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1rem;
 
-    cursor: pointer;
+    label {
+      margin-bottom: 0;
+    }
 
     input {
-      width: initial;
+      width: auto;
+      height: auto;
+    }
+  }
+
+  .submit-btn {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      background-color: ${(props) => props.theme.colorPrimary};
+      color: #fff;
+      transition: background-color 0.3s ease , transform 0.3s ease;
+
+      &:hover {
+        background-color: ${(props) => props.theme.colorPrimary2};
+        transform: translateY(-2px);
+      }
     }
   }
 `;

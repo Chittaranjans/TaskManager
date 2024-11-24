@@ -12,6 +12,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import NextTopLoader from "nextjs-toploader";
+// import Navbar from "./Components/Navbar/Navbar";
 
 const nunito = Nunito({
   weight: ["400", "500", "600", "700", "800"],
