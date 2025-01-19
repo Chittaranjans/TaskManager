@@ -2,15 +2,15 @@ name: One-Off Deploy via SST to AWS
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "public/**"
-      - "prisma/**"
-      - ".github/**"
-      - "package.json"
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "src/**"
+  #     - "public/**"
+  #     - "prisma/**"
+  #     - ".github/**"
+  #     - "package.json"
 
 jobs:
   deploy:
